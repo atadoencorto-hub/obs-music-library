@@ -71,7 +71,8 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(taglib)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE TagLib::tag)
+# Link TagLib using its CMake target
+target_link_libraries(${PROJECT_NAME} PRIVATE tag)
 
 # --- Linux Qt compatibility ---
 if((OS_LINUX OR OS_FREEBSD OR OS_OPENBSD) AND Qt6_VERSION VERSION_LESS "6.9.0")
