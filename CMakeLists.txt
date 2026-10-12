@@ -15,26 +15,31 @@ include(compilerconfig)
 include(defaults)
 include(helpers)
 
+# --- Plugin target ---
 add_library(${PROJECT_NAME} MODULE)
 
 # --- OBS libraries ---
 if(BUILD_OUT_OF_TREE)
   find_package(libobs REQUIRED)
   find_package(obs-frontend-api REQUIRED)
+
   target_link_libraries(
     ${PROJECT_NAME}
-    PRIVATE OBS::obs-frontend-api
+    PRIVATE
+      OBS::obs-frontend-api
   )
 else()
   target_link_libraries(
     ${PROJECT_NAME}
-    PRIVATE OBS::frontend-api
+    PRIVATE
+      OBS::frontend-api
   )
 endif()
 
 target_link_libraries(
   ${PROJECT_NAME}
-  PRIVATE OBS::libobs
+  PRIVATE
+    OBS::libobs
 )
 
 # --- Qt6 ---
@@ -48,7 +53,9 @@ endif()
 
 target_link_libraries(
   ${PROJECT_NAME}
-  PRIVATE Qt::Core Qt::Widgets
+  PRIVATE
+    Qt::Core
+    Qt::Widgets
 )
 
 # --- Metadata: TagLib and utf8cpp ---
@@ -87,11 +94,11 @@ FetchContent_MakeAvailable(taglib)
 # --- Link TagLib ---
 target_link_libraries(
   ${PROJECT_NAME}
-  PRIVATE tag
+  PRIVATE
+    tag
 )
 
 # --- TagLib include directories ---
-# Required for fileref.h, tfile.h and related headers
 target_include_directories(
   ${PROJECT_NAME}
   PRIVATE
@@ -125,7 +132,8 @@ if(
 
   target_link_libraries(
     ${PROJECT_NAME}
-    PRIVATE Qt::GuiPrivate
+    PRIVATE
+      Qt::GuiPrivate
   )
 endif()
 
@@ -137,12 +145,17 @@ target_compile_options(
     -Wno-comma>
 )
 
-# --- MSVC runtime ---
-set_target_properties(
-  ${PROJECT_NAME}
-  PROPERTIES
-    MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
-)
+# --- Windows MSVC runtime compatibility ---
+# Use the dynamic runtime to match TagLib and OBS.
+# Release: /MD
+# Debug:   /MDd
+if(MSVC)
+  set_property(
+    TARGET ${PROJECT_NAME}
+    PROPERTY MSVC_RUNTIME_LIBRARY
+    "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
+  )
+endif()
 
 # --- Qt automatic processing ---
 set_target_properties(
@@ -187,11 +200,14 @@ target_sources(
 if(BUILD_OUT_OF_TREE)
   set_target_properties_plugin(
     ${CMAKE_PROJECT_NAME}
-    PROPERTIES OUTPUT_NAME ${_name}
+    PROPERTIES
+      OUTPUT_NAME ${_name}
   )
 else()
   set_target_properties_obs(
     ${PROJECT_NAME}
-    PROPERTIES FOLDER "plugins/exeldro" PREFIX ""
+    PROPERTIES
+      FOLDER "plugins/exeldro"
+      PREFIX ""
   )
 endif()
