@@ -74,6 +74,16 @@ FetchContent_MakeAvailable(taglib)
 # Link TagLib using its CMake target
 target_link_libraries(${PROJECT_NAME} PRIVATE tag)
 
+# Make TagLib headers available to the plugin
+target_include_directories(
+  ${PROJECT_NAME}
+  PRIVATE
+    "${taglib_SOURCE_DIR}"
+    "${taglib_SOURCE_DIR}/taglib"
+    "${taglib_BINARY_DIR}"
+    "${taglib_BINARY_DIR}/taglib"
+)
+
 # --- Linux Qt compatibility ---
 if((OS_LINUX OR OS_FREEBSD OR OS_OPENBSD) AND Qt6_VERSION VERSION_LESS "6.9.0")
   find_package(Qt6 COMPONENTS GuiPrivate)
